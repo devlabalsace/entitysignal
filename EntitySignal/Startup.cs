@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -101,19 +102,18 @@ namespace EntitySignal
       app.UseHttpsRedirection();
       app.UseStaticFiles();
       app.UseCookiePolicy();
+
+      app.UseRouting();
+      if (env.IsDevelopment())
+         app.UseCors("AllowAnyOrigin");
+
       app.UseAuthentication();
-
       app.UseWebSockets();
-      app.UseSignalR(routes =>
-      {
-        routes.MapHub<EntitySignalHub>("/dataHub");
-      });
 
-      app.UseMvc(routes =>
+      app.UseEndpoints(endpoints =>
       {
-        routes.MapRoute(
-                  name: "default",
-                  template: "{controller=Home}/{action=Index}/{id?}");
+          endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+          endpoints.MapHub<EntitySignalHub>("/dataHub");
       });
     }
   }
